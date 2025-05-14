@@ -84,8 +84,6 @@ let data = await d3.csv("reports.csv", d3.autoType);
 
   function updateChart() {
     const locked = document.querySelector("#kneesLocked").checked;
-    const unlocked = document.querySelector("#kneesUnlocked").checked;
-    const open = document.querySelector("#eyesOpened").checked;
     const closed = document.querySelector("#eyesClosed").checked;
     
     const xVar = xSelect.property("value");
@@ -102,12 +100,11 @@ let data = await d3.csv("reports.csv", d3.autoType);
     const filtered = data.filter(d => {
         const kneeOk =
           (locked && d["Locked knees?"] === 1) ||
-          (unlocked && d["Locked knees?"] === 0) ||
-          (d["Locked Knees?"] === 0.5);
+          (!locked && d["Locked knees?"] === 0);
     
         const eyesOk =
           (open && d["Eyes open?"] === 1) ||
-          (closed && d["Eyes open?"] === 0)
+          (!open && d["Eyes open?"] === 1)
           ||(d["Eyes open?"] === 0.5);
     
         return kneeOk && eyesOk && (d[xVar] != null) && (d[yVarWith] != null) && (d[yVarWithout] != null);
