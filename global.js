@@ -155,7 +155,7 @@ let data = await d3.csv("reports.csv", d3.autoType);
         tooltip.style("background-color", colors.withoutMusic)
         tooltip.html(`Subject: ${d.Subject}<br>Group: ${d.Group}<br>${xVar}: ${d[xVar]}<br>Mean QoM Without Music: ${d["Mean QoM w/oM"].toFixed(2)}`);
         tooltip.style("left", (event.clientX + 10) + "px")
-        tooltip.style("top", (event.clientY - 20) + "px")
+        tooltip.style("top", (event.clientY + 10) + "px")
         })
       .on('mouseleave', () => {
         tooltip.style("opacity", 0);
@@ -184,73 +184,6 @@ let data = await d3.csv("reports.csv", d3.autoType);
       .attr("x2", x(xMax))
       .attr("y2", y(m2 * xMax + b2));
 
-/*     
-let hoverGroup = g.selectAll(".hover-group").data([null]);
-hoverGroup = hoverGroup.enter()
-  .append("g")
-  .attr("class", "hover-group")
-  .merge(hoverGroup);
-
-let diffLine = hoverGroup.selectAll(".diff-line").data([null]);
-diffLine = diffLine.enter()
-  .append("line")
-  .attr("class", "diff-line")
-  .attr("stroke", "gray")
-  .attr("stroke-dasharray", "4 2")
-  .attr("stroke-width", 1.5)
-  .style("display", "none")
-  .merge(diffLine);
-
-let diffLabel = hoverGroup.selectAll(".diff-label").data([null]);
-diffLabel = diffLabel.enter()
-  .append("text")
-  .attr("class", "diff-label")
-  .attr("text-anchor", "middle")
-  .attr("fill", "black")
-  .style("font-size", "12px")
-  .style("background", "white")
-  .style("display", "none")
-  .merge(diffLabel);
-
-// Transparent rectangle to track mouse
-let hoverRect = g.selectAll(".hover-rect").data([null]);
-hoverRect = hoverRect.enter()
-  .append("rect")
-  .attr("class", "hover-rect")
-  .attr("width", width)
-  .attr("height", height)
-  .attr("fill", "transparent")
-  .style("pointer-events", "all")
-  .merge(hoverRect);
-
-hoverRect
-  .on("mousemove", function(event) {
-    const [mx] = d3.pointer(event);
-    const xVal = x.invert(mx);
-
-    const yWith = m1 * xVal + b1;
-    const yWithout = m2 * xVal + b2;
-
-    diffLine
-      .attr("x1", x(xVal))
-      .attr("x2", x(xVal))
-      .attr("y1", y(yWith))
-      .attr("y2", y(yWithout))
-      .style("display", "block");
-
-    diffLabel
-      .attr("x", x(xVal))
-      .attr("y", y((yWith + yWithout) / 2) - 10)
-      .text(`Predicted Difference in movement with and without music: ${(yWith - yWithout).toFixed(2)}`)
-      .style("display", "block")
-      .style("background-color","white");
-  })
-  .on("mouseout", () => {
-    diffLine.style("display", "none");
-    diffLabel.style("display", "none");
-  });
-  hoverRect.lower();
-*/
   const tooltip2 = d3.select(".diff-tooltip");
   let hoverLine = g.selectAll(".hover-line").data([null]);
   hoverLine = hoverLine.enter()
