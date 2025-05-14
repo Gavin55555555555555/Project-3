@@ -100,11 +100,12 @@ let data = await d3.csv("reports.csv", d3.autoType);
     const filtered = data.filter(d => {
         const kneeOk =
           (locked && d["Locked knees?"] === 1) ||
-          (!locked && d["Locked knees?"] === 0);
+          (!locked && d["Locked knees?"] === 0)||
+          (d["Locked knees?"] === 0.5);
     
         const eyesOk =
-          (open && d["Eyes open?"] === 1) ||
-          (!open && d["Eyes open?"] === 0)
+          (closed && d["Eyes open?"] === 1) ||
+          (!closed && d["Eyes open?"] === 0)
           ||(d["Eyes open?"] === 0.5);
     
         return kneeOk && eyesOk && (d[xVar] != null) && (d[yVarWith] != null) && (d[yVarWithout] != null);
