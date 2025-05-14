@@ -223,9 +223,9 @@ let data = await d3.csv("reports.csv", d3.autoType);
       .style("opacity", 0.95)
       .html(`
         <strong>x:</strong> ${xVal.toFixed(2)}<br/>
-        <strong>With Music:</strong> ${yWith.toFixed(2)}<br/>
-        <strong>Without Music:</strong> ${yWithout.toFixed(2)}<br/>
-        <strong>Diff:</strong> ${diff.toFixed(2)}
+        <strong>QoM With Music:</strong> ${yWith.toFixed(2)}<br/>
+        <strong>QoM Without Music:</strong> ${yWithout.toFixed(2)}<br/>
+        <strong>QoM Difference:</strong> ${diff.toFixed(2)}
       `);
   })
   .on("mouseout", () => {
