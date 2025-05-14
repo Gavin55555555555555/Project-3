@@ -57,3 +57,16 @@ ul.legend{
         grid-row-start: 1;
     }
   }
+  
+  .tooltip {
+    position: absolute;
+    max-width: 200px;
+    white-space: normal;
+    word-wrap: break-word;
+    background-color: white;
+    padding: 8px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+    z-index: 10;
+    pointer-events: none;
+  }

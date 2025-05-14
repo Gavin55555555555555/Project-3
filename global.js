@@ -219,6 +219,7 @@ let data = await d3.csv("reports.csv", d3.autoType);
           .style("left", (event.pageX + 10) + "px")
           .style("top", (event.pageY - 20) + "px")
           .html(`w/o Music<br>x: ${xVal.toFixed(2)}<br>y: ${yVal.toFixed(2)}`);
+        console.log('a');
       })
       .on("mouseout", () => {
         tooltip.style("opacity", 0);
