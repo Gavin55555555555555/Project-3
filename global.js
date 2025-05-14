@@ -29,7 +29,7 @@ const yLabel = g.append("text")
   .attr("transform", `rotate(-90)`)
   .attr("x", -height / 2)
   .attr("y", -60)
-  .text("Mean QoM (millimeters/second)");
+  .text("Mean Quantity of Movement (QoM) (millimeters/second)");
 
 const colors = {
   withMusic: "#1f77b4",     // Blue
