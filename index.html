@@ -2,176 +2,47 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Scatterplot: Subject Traits vs Motion</title>
-  <script src="https://d3js.org/d3.v7.min.js"></script>
-  <style>
-    body {
-      font-family: sans-serif;
-      margin: 40px;
-    }
-    svg {
-      margin-top: 20px;
-    }
-    .axis-label {
-      font-weight: bold;
-    }
-    .tooltip {
-      position: absolute;
-      background: white;
-      border: 1px solid #ccc;
-      padding: 8px;
-      pointer-events: none;
-      opacity: 0;
-    }
-    select {
-      font-size: 16px;
-      margin-right: 20px;
-    }
-  </style>
+  <title>QoM vs Music Traits</title>
+  <script type = "module", src = "global.js" class = "code"></script>
+  <link rel="stylesheet" href="styles.css" class = "code">
 </head>
 <body>
 
-<h2>Interactive Scatterplot: Subject Metadata vs. Motion Metrics</h2>
+<h2>Mean Quality of Motion With and Without Music</h2>
 
-<label for="xVar">X-axis:</label>
-<select id="xVar"></select>
+<label for="xVar">Select X-axis variable:</label>
+<select id="xVar">
+  <option value="Age">Age</option>
+  <option value="Height (m)">Height (m)</option>
+  <option value="Music listening hours/week">Music listening hours/week</option>
+  <option value="Perform/produce/compose music hours/week">Perform/produce/compose music hours/week</option>
+  <option value="Dance hours/week">Dance hours/week</option>
+  <option value="Exercise (no dance) hours/week">Exercise (no dance) hours/week</option>
+  <!-- <option value="Tiresome experience (1-5)">Tiresome experience (1-5)</option>
+  <option value="Experience of motion (1-5)">Experience of motion (1-5)</option>
+  <option value="Experience of moving more to music (1-5)">Experience of moving more to music (1-5)</option>
+  <option value="Eyes open?">Eyes open?</option>
+  <option value="Locked knees?">Locked knees?</option>
+  <option value="NoMus-Mus Diff">NoMus-Mus Diff</option> -->
+</select>
 
-<label for="yVar">Y-axis:</label>
-<select id="yVar"></select>
+<div id="filters">
+  <strong>Filters:</strong><br/>
+  <label><input class = "knees" type="checkbox" id="kneesLocked" checked>Knees Locked</label>
+  <label><input class = "knees" type="checkbox" id="kneesUnlocked" checked>Knees Unlocked</label>
+  <label><input class = "eyes" type="checkbox" id="eyesOpened" checked> Eyes Open</label>
+  <label><input class = "eyes" type="checkbox" id="eyesClosed" checked> Eyes Closed</label>
+</div>
+
+<ul class = legend></ul>
+
 
 <svg width="960" height="600"></svg>
+<div id = "chart"></div>
 <div class="tooltip"></div>
-<script>
-const svg = d3.select("svg"),
-      margin = {top: 50, right: 50, bottom: 70, left: 80},
-      width = +svg.attr("width") - margin.left - margin.right,
-      height = +svg.attr("height") - margin.top - margin.bottom,
-      g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
-
-const tooltip = d3.select(".tooltip");
-
-const xSelect = d3.select("#xVar");
-const ySelect = d3.select("#yVar");
-
-const x = d3.scaleLinear().range([0, width]);
-const y = d3.scaleLinear().range([height, 0]);
-const color = d3.scaleOrdinal(d3.schemeCategory10);
-
-const xAxis = g.append("g").attr("transform", `translate(0,${height})`);
-const yAxis = g.append("g");
-
-const xLabel = g.append("text")
-  .attr("class", "axis-label")
-  .attr("text-anchor", "middle")
-  .attr("x", width / 2)
-  .attr("y", height + 50);
-
-const yLabel = g.append("text")
-  .attr("class", "axis-label")
-  .attr("text-anchor", "middle")
-  .attr("transform", `rotate(-90)`)
-  .attr("x", -height / 2)
-  .attr("y", -60);
-
-// Line of best fit
-const regressionLine = g.append("line")
-  .attr("stroke", "black")
-  .attr("stroke-width", 2)
-  .attr("opacity", 0.6);
-
-function calculateRegression(data, xVar, yVar) {
-  const n = data.length;
-  const sumX = d3.sum(data, d => d[xVar]);
-  const sumY = d3.sum(data, d => d[yVar]);
-  const meanX = sumX / n;
-  const meanY = sumY / n;
-
-  const sumXY = d3.sum(data, d => (d[xVar] - meanX) * (d[yVar] - meanY));
-  const sumX2 = d3.sum(data, d => Math.pow(d[xVar] - meanX, 2));
-
-  const slope = sumXY / sumX2;
-  const intercept = meanY - slope * meanX;
-
-  return {slope, intercept};
-}
-
-d3.csv("reports.csv").then(data => {
-  // Parse numeric values
-  data.forEach(d => {
-    for (let key in d) {
-      const val = +d[key];
-      if (!isNaN(val)) d[key] = val;
-    }
-  });
-
-  const numericVars = Object.keys(data[0]).filter(k => typeof data[0][k] === "number");
-
-  numericVars.forEach(v => {
-    xSelect.append("option").text(v).attr("value", v);
-    ySelect.append("option").text(v).attr("value", v);
-  });
-
-  xSelect.property("value", "Music listening hours/week");
-  ySelect.property("value", "Mean QoM");
-
-  function updateChart() {
-    const xVar = xSelect.property("value");
-    const yVar = ySelect.property("value");
-
-    const filtered = data.filter(d => d[xVar] !== undefined && d[yVar] !== undefined);
-
-    x.domain(d3.extent(filtered, d => d[xVar])).nice();
-    y.domain(d3.extent(filtered, d => d[yVar])).nice();
-
-    xAxis.transition().duration(500).call(d3.axisBottom(x));
-    yAxis.transition().duration(500).call(d3.axisLeft(y));
-
-    xLabel.text(xVar);
-    yLabel.text(yVar);
-
-    const dots = g.selectAll("circle").data(filtered, d => d.Subject);
-
-    dots.enter()
-      .append("circle")
-      .attr("r", 5)
-      .attr("fill", d => color(d.Group))
-      .on("mouseover", (event, d) => {
-        tooltip.transition().duration(200).style("opacity", 0.9);
-        tooltip.html(`Subject: ${d.Subject}<br>Group: ${d.Group}<br>${xVar}: ${d[xVar]}<br>${yVar}: ${d[yVar]}`)
-          .style("left", (event.pageX + 10) + "px")
-          .style("top", (event.pageY - 28) + "px");
-      })
-      .on("mouseout", () => tooltip.transition().duration(500).style("opacity", 0))
-      .merge(dots)
-      .transition().duration(500)
-      .attr("cx", d => x(d[xVar]))
-      .attr("cy", d => y(d[yVar]));
-
-    dots.exit().remove();
-
-    // ---- Add Regression Line ----
-    const {slope, intercept} = calculateRegression(filtered, xVar, yVar);
-
-    const xRange = x.domain();
-    const y1 = slope * xRange[0] + intercept;
-    const y2 = slope * xRange[1] + intercept;
-
-    regressionLine
-      .transition().duration(500)
-      .attr("x1", x(xRange[0]))
-      .attr("y1", y(y1))
-      .attr("x2", x(xRange[1]))
-      .attr("y2", y(y2));
-    
-    
-  }
-
-  xSelect.on("change", updateChart);
-  ySelect.on("change", updateChart);
-
-  updateChart();
-});
-</script>
+<div class="point-tool"></div>
 
 </body>
 </html>
+
+
