@@ -133,8 +133,8 @@ let data = await d3.csv("reports.csv", d3.autoType);
             tooltip.style("opacity", 0.9)
             tooltip.style("background-color", colors.withMusic)
             tooltip.html(`Subject: ${d.Subject}<br>Group: ${d.Group}<br>${xVar}: ${d[xVar]}<br>Mean QoM With Music: ${d["Mean QoM w M"].toFixed(2)}`);
-            tooltip.style("left", (event.pageX + 10) + "px")
-            tooltip.style("top", (event.pageY - 20) + "px")
+            tooltip.style("left", (event.clientX + 10) + "px")
+            tooltip.style("top", (event.clientY - 20) + "px")
         })
         .on('mouseleave', () => {
             tooltip.style("opacity", 0);
@@ -154,8 +154,8 @@ let data = await d3.csv("reports.csv", d3.autoType);
         tooltip.style("opacity", 0.9)
         tooltip.style("background-color", colors.withoutMusic)
         tooltip.html(`Subject: ${d.Subject}<br>Group: ${d.Group}<br>${xVar}: ${d[xVar]}<br>Mean QoM Without Music: ${d["Mean QoM w/oM"].toFixed(2)}`);
-        tooltip.style("left", (event.pageX + 10) + "px")
-        tooltip.style("top", (event.pageY - 20) + "px")
+        tooltip.style("left", (event.clientX + 10) + "px")
+        tooltip.style("top", (event.clientY - 20) + "px")
         })
       .on('mouseleave', () => {
         tooltip.style("opacity", 0);
@@ -184,48 +184,8 @@ let data = await d3.csv("reports.csv", d3.autoType);
       .attr("x2", x(xMax))
       .attr("y2", y(m2 * xMax + b2));
 
-    // Tooltip interaction (only when hovering over line with music)
-    lineWith
-      .on("mousemove", (event) => {
-        const [mx] = d3.pointer(event);
-        const xVal = x.invert(mx);
-        const yVal = m1 * xVal + b1;
-        marker
-          .style("display", "block")
-          .attr("cx", x(xVal))
-          .attr("cy", y(yVal));
-        tooltip
-          .style("opacity", 0.9)
-          .style("left", (event.pageX + 10) + "px")
-          .style("top", (event.pageY - 20) + "px")
-          .html(`w/ Music<br>x: ${xVal.toFixed(2)}<br>y: ${yVal.toFixed(2)}`);
-      })
-      .on("mouseout", () => {
-        tooltip.style("opacity", 0);
-        marker.style("display", "none");
-      });
-
-    lineWithout
-      .on("mousemove", (event) => {
-        const [mx] = d3.pointer(event);
-        const xVal = x.invert(mx);
-        const yVal = m2 * xVal + b2;
-        marker
-          .style("display", "block")
-          .attr("cx", x(xVal))
-          .attr("cy", y(yVal));
-        tooltip
-          .style("opacity", 0.9)
-          .style("left", (event.pageX + 10) + "px")
-          .style("top", (event.pageY - 20) + "px")
-          .html(`w/o Music<br>x: ${xVal.toFixed(2)}<br>y: ${yVal.toFixed(2)}`);
-        console.log('a');
-      })
-      .on("mouseout", () => {
-        tooltip.style("opacity", 0);
-        marker.style("display", "none");
-      });
-      let hoverGroup = g.selectAll(".hover-group").data([null]);
+/*     
+let hoverGroup = g.selectAll(".hover-group").data([null]);
 hoverGroup = hoverGroup.enter()
   .append("g")
   .attr("class", "hover-group")
@@ -290,6 +250,57 @@ hoverRect
     diffLabel.style("display", "none");
   });
   hoverRect.lower();
+*/
+  const tooltip2 = d3.select(".diff-tooltip");
+  let hoverLine = g.selectAll(".hover-line").data([null]);
+  hoverLine = hoverLine.enter()
+    .append("line")
+    .attr("class", "hover-line")
+    .attr("stroke", "gray")
+    .attr("stroke-dasharray", "4 2")
+    .attr("stroke-width", 1.5)
+    .style("display", "none")
+    .merge(hoverLine);
+  let hoverRect = g.append("rect")
+  .attr("width", width)
+  .attr("height", height)
+  .attr("fill", "transparent")
+  .style("pointer-events", "all");
+  hoverRect
+    .on("mousemove", function(event) {
+      const [mx] = d3.pointer(event);
+      const xVal = x.invert(mx);
+      const yWith = m1 * xVal + b1;
+      const yWithout = m2 * xVal + b2;
+      const diff = yWith - yWithout;
+      const yMid = (yWith + yWithout) / 2;
+    // Update vertical line position
+    hoverLine
+      .attr("x1", x(xVal))
+      .attr("x2", x(xVal))
+      .attr("y1", y(yWith))
+      .attr("y2", y(yWithout))
+      .style("display", "block");
+
+    // Position tooltip near the line
+    const svgRect = d3.select("svg").node().getBoundingClientRect();
+    tooltip2
+      .style("left", `${svgRect.left + x(xVal) + margin.left}px`)
+      .style("top", `${svgRect.top + y((yWith + yWithout) / 2) + margin.top}px`)
+      .style("opacity", 0.95)
+      .html(`
+        <strong>x:</strong> ${xVal.toFixed(2)}<br/>
+        <strong>With Music:</strong> ${yWith.toFixed(2)}<br/>
+        <strong>Without Music:</strong> ${yWithout.toFixed(2)}<br/>
+        <strong>Diff:</strong> ${diff.toFixed(2)}
+      `);
+  })
+  .on("mouseout", () => {
+    tooltip2.style("opacity", 0);
+    hoverLine.style("display", "none");
+  });
+  hoverRect.lower();
+
 }
 
   xSelect.on("change", updateChart);

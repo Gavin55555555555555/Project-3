@@ -20,53 +20,65 @@ svg {
 }
 
 ul.legend{
-    flex: 1;
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(9em, 1fr));
-    border-style: solid;
-    border-color: oklch(50% 10% 200 / 40%);
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(9em, 1fr));
+  border-style: solid;
+  border-color: oklch(50% 10% 200 / 40%);
     
-    .swatch{
-      width : 20px;
-      aspect-ratio: 1/1;
-      background-color: var(--color);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-    }
-    .legend_element{
-      display: flex;
-      min-width: 50px;
-      align-items: center;
-      gap: 10px;
-      padding: 10px;
-    }
+  .swatch{
+    width : 20px;
+    aspect-ratio: 1/1;
+    background-color: var(--color);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
   }
-  #filters{
-    display: grid;
-    grid-template-rows: 20px 20px 20px ;
-    grid-template-columns: 200px 200px;
-    strong{
-        grid-row-start: 0;
-        grid-row-end: 2;
-    }
-    input.eyes{
-        grid-column-start: 0;
-    }
-    input.knees{
-        grid-row-start: 1;
-    }
+  .legend_element{
+    display: flex;
+    min-width: 50px;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
   }
+}
+#filters{
+  display: grid;
+  grid-template-rows: 20px 20px 20px ;
+  grid-template-columns: 200px 200px;
+  strong{
+    grid-row-start: 0;
+    grid-row-end: 2;
+  }
+  input.eyes{
+      grid-column-start: 0;
+  }
+  input.knees{
+      grid-row-start: 1;
+  }
+}
   
-  .tooltip {
-    position: absolute;
-    max-width: 200px;
-    white-space: normal;
-    word-wrap: break-word;
-    background-color: white;
-    padding: 8px;
-    border: 1px solid #ccc;
-    font-size: 14px;
-    z-index: 10;
-    pointer-events: none;
-  }
+.tooltip {
+  position: absolute;
+  max-width: 100px;
+  white-space: normal;
+  word-wrap: break-word;
+  padding: 8px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.diff-tooltip {
+  position: absolute;
+  background: white;
+  border: 1px solid gray;
+  padding: 6px 10px;
+  font-size: 13px;
+  max-width: 240px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s;
+  z-index: 10;
+}
