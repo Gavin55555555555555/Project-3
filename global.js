@@ -29,7 +29,7 @@ const yLabel = g.append("text")
   .attr("transform", `rotate(-90)`)
   .attr("x", -height / 2)
   .attr("y", -60)
-  .text("Mean Quantity of Movement (QoM) (millimeters/second)");
+  .text("Mean Quantity of Movement (QoM (millimeters/second)");
 
 const colors = {
   withMusic: "#1f77b4",     // Blue
@@ -184,32 +184,15 @@ let data = await d3.csv("reports.csv", d3.autoType);
       .attr("x2", x(xMax))
       .attr("y2", y(m2 * xMax + b2));
 
-  const tooltip2 = d3.select(".diff-tooltip");
-  let hoverLine = g.selectAll(".hover-line").data([null]);
-  hoverLine = hoverLine.enter()
-    .append("line")
-    .attr("class", "hover-line")
-    .attr("stroke", "gray")
-    .attr("stroke-dasharray", "4 2")
-    .attr("stroke-width", 1.5)
-    .style("display", "none")
-    .merge(hoverLine);
-  let hoverRect = g.append("rect")
-  .attr("width", width)
-  .attr("height", height)
-  .attr("fill", "transparent")
-  .style("pointer-events", "all");
+  
   hoverRect
-    .on("mousemove", function(event) {
-      const regressionWith = d3.regressionLinear().x(d => d[xVar]).y(d => d[yVarWith])(filteredData);
-      const regressionWithout = d3.regressionLinear().x(d => d[xVar]).y(d => d[yVarWithout])(filteredData);
-      const m1 = regressionWith.b;
-      const [mx] = d3.pointer(event);
-      const xVal = x.invert(mx);
-      const yWith = m1 * xVal + b1;
-      const yWithout = m2 * xVal + b2;
-      const diff = yWith - yWithout;
-      const yMid = (yWith + yWithout) / 2;
+  .on("mousemove", function(event) {
+    const [mx] = d3.pointer(event, this);
+    const xVal = x.invert(mx);
+    const yWith = m1 * xVal + b1;
+    const yWithout = m2 * xVal + b2;
+    const diff = yWith - yWithout;
+
     // Update vertical line position
     hoverLine
       .attr("x1", x(xVal))
@@ -218,11 +201,11 @@ let data = await d3.csv("reports.csv", d3.autoType);
       .attr("y2", y(yWithout))
       .style("display", "block");
 
-    // Position tooltip near the line
+    // Tooltip
     const svgRect = d3.select("svg").node().getBoundingClientRect();
     tooltip2
-      .style("left", `${svgRect.left + x(xVal) + margin.left}px`)
-      .style("top", `${svgRect.top + y((yWith + yWithout) / 2) + margin.top}px`)
+      .style("left", `${svgRect.left + x(xVal)}px`)
+      .style("top", `${svgRect.top +600}px`)
       .style("opacity", 0.95)
       .html(`
         <strong>x:</strong> ${xVal.toFixed(2)}<br/>
@@ -239,7 +222,31 @@ let data = await d3.csv("reports.csv", d3.autoType);
 
 }
 
-  xSelect.on("change", updateChart);
-  updateChart();
+  
+
+  const hoverLine = g.append("line")
+  .attr("class", "hover-line")
+  .attr("stroke", "gray")
+  .attr("stroke-dasharray", "4 2")
+  .attr("stroke-width", 1.5)
+  .style("display", "none");
+
+const tooltip2 = d3.select("body").append("div")
+  .attr("class", "diff-tooltip")
+  .style("opacity", 0)
+  .style("position", "absolute");
+
+const hoverRect = g.append("rect")
+  .attr("class", "hover-rect")
+  .attr("width", width)
+  .attr("height", height)
+  .attr("fill", "transparent")
+  .style("pointer-events", "all");
+
+// Put it below points
+hoverRect.lower();
+
+xSelect.on("change", updateChart);
+updateChart();
 
 
