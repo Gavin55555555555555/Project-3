@@ -201,6 +201,9 @@ let data = await d3.csv("reports.csv", d3.autoType);
   .style("pointer-events", "all");
   hoverRect
     .on("mousemove", function(event) {
+      const regressionWith = d3.regressionLinear().x(d => d[xVar]).y(d => d[yVarWith])(filteredData);
+      const regressionWithout = d3.regressionLinear().x(d => d[xVar]).y(d => d[yVarWithout])(filteredData);
+      const m1 = regressionWith.b;
       const [mx] = d3.pointer(event);
       const xVal = x.invert(mx);
       const yWith = m1 * xVal + b1;
